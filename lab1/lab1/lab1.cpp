@@ -1,13 +1,20 @@
 ﻿#include <iostream>
 #include <windows.h>
+#include <math.h>
 
+//6 вариант
 int main()
 {
-    DWORD startTime, endTime;
-    startTime = GetTickCount();
-    //выполенние операций
-  
-    endTime = GetTickCount();
-    printf("Work time: %d\n", startTime);
-    return 0;
+	DWORD startTime, endTime;
+	startTime = GetTickCount();
+	//выполенние операций
+	int sum = 0;
+	for (int x = 1; x <= 10; x++) {
+		for (int i = 1; i < 100000000; i++) {
+			sum += pow(cos(i * x * x * x),4);
+		}
+	}
+	endTime = GetTickCount();
+	printf("Work time: %d\n", endTime - startTime);
+	return 0;
 }
