@@ -7,9 +7,10 @@ namespace lab3
     {
         static void Main(string[] args)
         {
-            int KL = 3;
-            int L = 7;
-            int R = 60;
+            // Алгоритма SPT через алгоритм RR
+            int KL = 3; //длительность кванта времени, уделяемого одной задаче
+            int L = 5; //максимальная длительность решения сложной задачи
+            int R = 40; //вероятность прихода сложной заявки
             Queue<int> A = new Queue<int>(); //очередь длительностей процессов            
             Random rnd = new Random();
             int ticks = 0; //общее количество тактов
@@ -18,13 +19,13 @@ namespace lab3
             int processedSmallWorks = 0; //количество обработанных малых работ
             for (int i = 0; i < 10; i++) //инициализация очереди
             {
-                if (rnd.Next(100) < R) //с вероятностью 60% приходит большая заявка
+                if (rnd.Next(100) < R) //с вероятностью R приходит большая заявка
                 {
                     A.Enqueue(L);
                 }
                 else
                 {
-                    int work = rnd.Next(1, 5); //с вероятностью 40% приходит средняя или минимальная заявка
+                    int work = rnd.Next(1, 5); //с вероятностью 60% приходит средняя или минимальная заявка
                     A.Enqueue(work);
                     if (work <= KL) smallWorks++;
                 }
@@ -50,8 +51,8 @@ namespace lab3
             if (smallWorks > 0) //если маленьких работ не было, то не вычисляем эту характеристику
             {
                 double middleTimeOfMinimumWorks = (double)smallTimes / smallWorks; //среднее время ожидания маленькой заявки в тактах
+                Console.WriteLine("Среднее время ожидания маленьких заявак(такт) {0:N}", middleTimeOfMinimumWorks);
             }
-
         }
     }
 }
