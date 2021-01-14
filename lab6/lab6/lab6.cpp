@@ -10,6 +10,18 @@ double InFunction(double x) { //Подынтегральная функция
 }
 
 //  формула прямоугольноков
+double CalcIntegral(double a, double b, int n) {
+	double result = 0, h = (b - a) / n;
+
+	for (int i = 0; i < n; i++) {
+		result += InFunction(a + h * (i + 0.5));
+	}
+
+	result *= h;
+	return result;
+}
+
+
 
 int main()
 {
@@ -57,4 +69,10 @@ reduction (+:result)
 	//выводим время работы теста на экран
 	printf("Время вычисления %f\n", endTime - startTime);
 
+
+	startTime = omp_get_wtime();
+	double result2 = CalcIntegral(a, b, N);
+	endTime = omp_get_wtime();
+	//выводим время работы теста на экран
+	printf("Время вычисления без распараллеливания %f\n", endTime - startTime);
 }
