@@ -7,7 +7,6 @@ namespace lab3
     {
         static void Main(string[] args)
         {
-            // Алгоритма SPT через алгоритм RR
             int KL = 3; //длительность кванта времени, уделяемого одной задаче
             int L = 5; //максимальная длительность решения сложной задачи
             int R = 40; //вероятность прихода сложной заявки
@@ -30,6 +29,8 @@ namespace lab3
                     if (work <= KL) smallWorks++;
                 }
             }
+
+            // Алгоритма SPT через алгоритм RR
             while (A.Count != 0)
             {
                 int nextWork = A.Dequeue(); //берем задачу из очереди
@@ -48,10 +49,54 @@ namespace lab3
                 }
                 ticks++;
             }
+
             if (smallWorks > 0) //если маленьких работ не было, то не вычисляем эту характеристику
             {
                 double middleTimeOfMinimumWorks = (double)smallTimes / smallWorks; //среднее время ожидания маленькой заявки в тактах
-                Console.WriteLine("Среднее время ожидания маленьких заявак(такт) {0:N}", middleTimeOfMinimumWorks);
+                Console.WriteLine("Среднее время ожидания маленьких заявок SPT(такт) {0:N}", middleTimeOfMinimumWorks);
+            }
+
+            //алгоритм без прерываний 
+            ticks = 0; //общее количество тактов
+            smallTimes = 0; //общее время ожидания маленьких работ
+            smallWorks = 0;
+            processedSmallWorks = 0; //количество обработанных малых работ
+            for (int i = 0; i < 10; i++) //инициализация очереди
+            {
+                if (rnd.Next(100) < R) //с вероятностью R приходит большая заявка
+                {
+                    A.Enqueue(L);
+                }
+                else
+                {
+                    int work = rnd.Next(1, 5); //с вероятностью 60% приходит средняя или минимальная заявка
+                    A.Enqueue(work);
+                    if (work <= KL) smallWorks++;
+                }
+            }
+
+            while (A.Count != 0)
+            {
+                int nextWork = A.Dequeue(); //берем задачу из очереди
+                if (nextWork > KL) //если задача выполняется дольше такта
+                {
+                    while (nextWork > KL)
+                    {
+                        nextWork -= KL;
+                        ticks++;
+                    }
+                }
+                else
+                {
+                    smallTimes += ticks; //для маленьких задач подсчитываем время ожидания
+                }
+                ticks++;
+            }
+
+            if (smallWorks > 0) //если маленьких работ не было, то не вычисляем эту характеристику
+            {
+                double middleTimeOfMinimumWorks = (double)smallTimes / smallWorks; //среднее время ожидания маленькой заявки в тактах
+                Console.WriteLine("Среднее время ожидания маленьких заявок без прерываний(такт) {0:N}", middleTimeOfMinimumWorks);
             }
         }
     }
