@@ -9,9 +9,12 @@ namespace lab5
         static void Main(string[] args)
         {
             Queue<ObcMPC.CPTask> tasks = new Queue<ObcMPC.CPTask>();
-            tasks.Enqueue(new ObcMPC.CPTask(10, 5));
-            tasks.Enqueue(new ObcMPC.CPTask(10, 5));
-            Console.WriteLine(ObcMPC.ModelWithCommonMemory(tasks, 2, tasks.Count));
+            Random rnd = new Random();
+            for (int i = 0; i < 10; i++)
+            {
+                tasks.Enqueue(new ObcMPC.CPTask(rnd.Next(1, 10), 5));
+            }
+            Console.WriteLine("Время работы: {0}", ObcMPC.ModelWithCommonMemory(tasks, 2, tasks.Count));
             IndMPC.Run();
         }
 
@@ -19,6 +22,8 @@ namespace lab5
     }
     class ObcMPC
     {
+        static int max = 100;
+        static Queue<CPTask> copiesTasks ;
         public class CPTask
         {
             public double TimeTask;
@@ -29,9 +34,22 @@ namespace lab5
                 this.TypeTask = typeTask;
             }
         }
+        static public void AddSomeWork()
+        {
+            Random rnd = new Random();
+            //вероятность прихода заявки 2/3.
+            //если заявка не пришла, сразу же выходим
+            if (rnd.Next(3) == 0) return;
+            max--;
+            if (max <= 0) return;
+            //генерируем длительность заявки и ее тип
+            copiesTasks.Enqueue(new ObcMPC.CPTask(rnd.Next(1, 10), 5));  
+            Console.WriteLine("Принята заявка ");
+        }
+
         static public double ModelWithCommonMemory(Queue<CPTask> tasks, int processors, int controlTask)
         {
-            Queue<CPTask> copiesTasks = new Queue<CPTask>(tasks); 
+            copiesTasks = new Queue<CPTask>(tasks);
             double[] workingProcessors = new double[processors];
             CPTask currentTask = null;
             double minimalTask = 0;
@@ -40,12 +58,15 @@ namespace lab5
             int controlProcessor = 0;
             double totalTime = 0;
             double controlTime = 0;
-            while (copiesTasks.Count != 0)
+            int tick = 0;
+            while (copiesTasks.Count != 0 || max > 0)
             {
+                tick++;
+                AddSomeWork();
                 totalTime += minimalTask;
                 for (int i = 0; i < processors; ++i)
                 {
-                    if (workingProcessors[i] == 0)
+                    if (workingProcessors[i] == 0 && copiesTasks.Count != 0)
                     {
                         ++taskDone;
                         if (taskDone == controlTask)
@@ -63,7 +84,8 @@ namespace lab5
                     {
                         controlTime = totalTime;
                     }
-                }
+       
+                } 
                 minimalTask = workingProcessors.Min();
                 if (minimalTask == 0)
                 {
@@ -80,14 +102,15 @@ namespace lab5
                     }
                 }
             }
-            return controlTime;
+            return tick;
         }
     }
 
     // модель МПС с индивидуальной памятью
     class IndMPC
     {
-        static int procCount = 5; //количество процессоров
+        static int max = 100;
+        static int procCount = 2; //количество процессоров
         static int[] procs = new int[procCount]; //массив длин задач на процессорах
         static Queue<int>[] qs = new Queue<int>[procCount]; //массив очередей для каждого процессора
         static Random rnd = new Random();
@@ -97,6 +120,8 @@ namespace lab5
             //вероятность прихода заявки 2/3.
             //если заявка не пришла, сразу же выходим
             if (rnd.Next(3) == 0) return;
+            max--;
+            if (max <= 0) return;
             //генерируем длительность заявки и ее тип
             int work = rnd.Next(1, 10);
             int type = rnd.Next(procCount);
@@ -133,11 +158,11 @@ namespace lab5
                 qs[i] = new Queue<int>();
             }
 
-            int ticks;
+            int ticks = 0;
             //для начала сгенерируем некоторое количество работы
             for (int i = 0; i < 10; i++) AddSomeWork();
             //ждем окончания обработки всех заявок
-            for (ticks = 0; !AllWorkDone(); ticks++)
+            while (!AllWorkDone() || max > 0)
             {
                 //моделируем случайное событие прихода случайной заявки
                 AddSomeWork();
@@ -147,13 +172,14 @@ namespace lab5
                     //отнимаем от времени ее выполнения единицу.
                     //и тут же проверяем, не выполнилась ли задача
                     if (procs[i] != -1 && --procs[i] == 0)
-                    {
+                    { 
                         //добавляем задачу из очереди, если еще остались
                         if (qs[i].Count() != 0) procs[i] = qs[i].Dequeue();
                         //отключаем процессор, очередь закончилась.
                         else procs[i] = -1;
                     }
                 }
+                ticks++;
             }
             Console.WriteLine("Время работы: {0}", ticks);
             Console.ReadKey();
