@@ -1,11 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
 
-namespace lab8
+namespace lab72
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading;
+
+    // синхронная алоха
     class Station
     {
         Random rnd = new Random();
@@ -13,20 +16,15 @@ namespace lab8
         {
             this.id = id;
             this.packetCount = packetCount;
+            this.packetmax = packetCount;
             collisions++;
         }
 
         // увеличивает время ожидания при коллизиях
         public int delay()
         {
-            nextTime = rnd.Next(1, 10) ;
-            // удвоение времени ожидания после коллизии
-            if (collisions > 0) nextTime = (int)Math.Pow(nextTime, collisions+1);
-            // если уже превышаем максимальное время ожидания сообщаем о нарушении связи
-            if(nextTime > maxtime)
-            {
-                Console.WriteLine("Stantion {0}, communication failure!",id);
-            }
+            nextTime = rnd.Next(1, 100);
+            packetCount = packetCount>packetmax? packetCount: packetCount+1;
             return nextTime;
         }
         public int packetCount = 0;
@@ -34,6 +32,7 @@ namespace lab8
         public int id;
         public int collisions = 0;
         public int maxtime = 100;
+        public int packetmax = 0;
     }
     class Program
     {
@@ -45,11 +44,10 @@ namespace lab8
             Station[] stations = new Station[n];
             //количество пакетов 7
             for (int i = 0; i < n; i++) stations[i] = new Station(i, 7);
-            Random rnd = new Random();
             int globalTicks = 0;
             while (!AllPacketsSended(stations))
             {
-                Thread.Sleep(50);
+                //Thread.Sleep(50);
                 Station stationToStartSending;
                 int numberStationsReadyToSend = GetNumberStationsReadyToSend(stations,
                 out stationToStartSending);
@@ -67,7 +65,7 @@ namespace lab8
                 // если несколько станций отправляют то коллизии
                 else if (numberStationsReadyToSend > 1)
                 {
-                     
+
                     Console.WriteLine("Collision was detected!");
                     for (int i = 0; i < stations.Count(); i++)
                     {
@@ -96,11 +94,11 @@ namespace lab8
             Station minStation = stations[0];
             foreach (Station s in stations)
             {
-                if (  s.packetCount > 0)
+                if (s.packetCount > 0)
                 {
-                     minStation = s;
+                    minStation = s;
                 }
-                  
+
             }
             return minStation;
         }

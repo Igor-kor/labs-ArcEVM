@@ -10,34 +10,38 @@ namespace lab4
     {
         static void Main(string[] args)
         {
-            Macnoton.Run();
-            LPT.Run();
+            int n = 5;
+            int k = 2;
+            int[] works = new int[n]; //массив заданий
+            for (int i = 0; i < k; i++) works[i] = new Random().Next(1, 12);
+            Macnoton.Run(works,2);
+            LPT.Run(works,2);
         }
 
         static class Macnoton
         {
-            public static void Run()
+            public static void Run(int[] timesOfTasks, int procCount)
             {
-                int L = 5; // кол-во заданий
-                int n = 2; // кол-во идентичных процессоров
+                //int L = 5; // кол-во заданий
+                //int n = 2; // кол-во идентичных процессоров
                 double theta; // вещественное значение нижней границы времени для алгоритма Макнотона
                               //лучше использовать целочисленное значение.
                 double optimalT1;
                 double wasteTime1;
-                int[] timesOfTasks = new int[L];
-                Random init = new Random();
+                //int[] timesOfTasks = new int[L];
+                //Random init = new Random();
 
-                for (int i = 0; i < L; ++i)
+               /* for (int i = 0; i < L; ++i)
                 {
                     timesOfTasks[i] = init.Next(1, 12); // случайная инициализация массива временем выполнения заданий
-                }
+                }*/
                 Array.Sort(timesOfTasks); // Сортируем массив
                 Array.Reverse(timesOfTasks); // делаем перестановку элементов, чтобы они были убывающими
-                theta = Math.Max(timesOfTasks[0], middleOfSum(timesOfTasks, n));
+                theta = Math.Max(timesOfTasks[0], middleOfSum(timesOfTasks, procCount));
                 optimalT1 = theta;
-                wasteTime1 = AlgorithmMaknoton(timesOfTasks, theta, n);
+                wasteTime1 = AlgorithmMaknoton(timesOfTasks, theta, procCount);
 
-                Console.WriteLine("\nПростой процессора - {0:0.0} \n Оптимальное время(нижняя граница) - {1:0.0} ", wasteTime1, theta);
+                Console.WriteLine("\nПростой процессора - {0:0.0} \n Оптимальное время(нижняя граница) - {1:0.0} ", wasteTime1, optimalT1);
             }
         }
 
@@ -69,16 +73,14 @@ namespace lab4
 
     static class LPT
     {
-        public static void Run()
+        public static void Run(int[] works, int procCount)
         {
-            int k = 2; //количество процессоров
-            int n = 5; //количество заданий
+            //int k = 2; //количество процессоров
+           // int n = 5; //количество заданий
             int q = 4; //время, уделяемое одной задаче
 
             List<int> p = new List<int>(); //массив процессоров
-            for (int i = 0; i < k; i++) p.Add(0);
-            int[] works = new int[n]; //массив заданий
-            for (int i = 0; i < k; i++) works[i] = new Random().Next(1, 5);
+            for (int i = 0; i < procCount; i++) p.Add(0); 
             Array.Sort(works);
             Array.Reverse(works);
             Queue<int> pack = new Queue<int>(); //отсортированная очередь заданий
@@ -97,6 +99,8 @@ namespace lab4
                     ticks++;
                 }
             } while (CheckProcessors(p)); //все ли процессоры выполнили все работу
+
+            Console.WriteLine("Количество тактов {0}",ticks);
         }
 
         static bool CheckProcessors(List<int> processors)

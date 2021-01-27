@@ -10,7 +10,8 @@ namespace lab5
         {
             Queue<ObcMPC.CPTask> tasks = new Queue<ObcMPC.CPTask>();
             tasks.Enqueue(new ObcMPC.CPTask(10, 5));
-            ObcMPC.ModelWithCommonMemory(tasks, 2,10);
+            tasks.Enqueue(new ObcMPC.CPTask(10, 5));
+            Console.WriteLine(ObcMPC.ModelWithCommonMemory(tasks, 2, tasks.Count));
             IndMPC.Run();
         }
 
@@ -30,7 +31,7 @@ namespace lab5
         }
         static public double ModelWithCommonMemory(Queue<CPTask> tasks, int processors, int controlTask)
         {
-            Queue<CPTask> copiesTasks = new Queue<CPTask>(tasks);
+            Queue<CPTask> copiesTasks = new Queue<CPTask>(tasks); 
             double[] workingProcessors = new double[processors];
             CPTask currentTask = null;
             double minimalTask = 0;

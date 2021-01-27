@@ -81,7 +81,7 @@ int main(int argc, char* argv[])
 	//Используем русскую локаль
 	setlocale(LC_ALL, "Russian");
 
-	const int MAX_SIZE = 10000000;
+	const int MAX_SIZE = 100000000;
 
 	//Тем самым пропускаем 4 float из массива
 	float* x = (float*)_aligned_malloc(sizeof(float) * MAX_SIZE, 16);
